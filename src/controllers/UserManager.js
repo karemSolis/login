@@ -1,4 +1,4 @@
-import { usersModel } from '../models/users.model.js'
+import { usersModel } from '../models/users.js'
 
 class UserManager {
     constructor() {
