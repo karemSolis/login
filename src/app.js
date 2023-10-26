@@ -93,7 +93,7 @@ app.get("/login", (req, res) => {
 
 app.get("/register", (req, res) => {
   // Renderiza la vista de registro
-  res.render("register", {
+  res.render("formRegister", {
     title: "Registro"
   });
 });
@@ -105,7 +105,7 @@ app.get("/profile", (req, res) => {
   }
 
   // Renderiza la vista de perfil
-  res.render("profile", {
+  res.render("userProfile", {
     title: "Perfil de Usuario",
     email: req.session.emailUsuario
   });
