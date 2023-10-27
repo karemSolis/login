@@ -1,10 +1,11 @@
 import UserManager from "../controllers/UserManager.js";
 import { Router } from "express";
 
+
 const userRouter = Router();
 const user = new UserManager();
 
-userRouter.post("/register", async (req, res) => {
+userRouter.post("/formRegister", async (req, res) => {
     try {
         const newUser = req.body;
         const result = await user.addUser(newUser);
@@ -28,12 +29,12 @@ userRouter.post("/login", async (req, res) => {
             if (user.rol === 'admin') {
                 req.session.nomUsuario = user.first_name;
                 req.session.apeUsuario = user.last_name;
-                res.redirect("/profile");
+                res.redirect("userProfile");
             } else {
                 res.redirect("/products");
             }
         } else {
-            res.redirect("/login");
+            res.redirect("../../login");
         }
     } catch (error) {
         res.status(500).send("Error al iniciar sesión: " + error.message);
@@ -41,12 +42,12 @@ userRouter.post("/login", async (req, res) => {
 });
 
 
-userRouter.get("/logout", (req, res) => {
+userRouter.get("/logout", (req, res) => { //En este caso, "/logout" es una ruta que se utiliza para gestionar el cierre de sesión de un usuario
     req.session.destroy((error) => {
         if (error) {
             return res.json({ status: 'Logout Error', body: error });
         }
-        res.redirect('/login');
+        res.redirect('../../login');
     });
 });
 

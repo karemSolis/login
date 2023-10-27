@@ -10,6 +10,8 @@ import mongoose from "mongoose";
 import MongoStore from "connect-mongo"
 import session from 'express-session'
 import FileStore from 'session-file-store'
+import userRouter from "./router/users.routes.js";
+
 
 
 const app = express(); //aquí la creación de la instancia de la apli express
@@ -33,19 +35,20 @@ app.use(session({
   //Session registrada en mongo atlas
   store: MongoStore.create({
     mongoUrl: "mongodb+srv://soliskarem:yHO8pYSTC6sFsoi1@coder.9lutzzn.mongodb.net/?retryWrites=true&w=majority",
-    mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true }, ttl: 3600
+    mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true }, ttl: 4000
   }),
   secret: "ClaveSecreta",
-  resave: false,
-  saveUninitialized: false,
+  resave: true,
+  saveUninitialized: true,
 }))
 
 app.use("/api/productos", productRouter)
 app.use("/api/carritos", CartRouter);
+app.use("/api/sessions", userRouter)
 
 //analizarán solicitudes HTTP entrantes y los convertirán en formato json o url
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false }));
 
 
 //estos middlewars son toda la extructura de handlebars
@@ -55,8 +58,6 @@ app.set("view engine", "handlebars"); /*acá le digo al server que los archivos 
 como handlebars, eso significa que express usará handlebars para renderizar las vistas*/
 app.set("views", path.resolve(__dirname + "/views")); /*y además obvio debo decirle donde encontrar esos archivos, estableciendo la ubicación de las vistas
 es una ruta absoluta al directorio de vistas que utiliza __dirname que he importado desde utils.js, así que express buscará en ese directorio las*/
-
-
 //middleware para archivos estáticos
 app.use("/", express.static(__dirname + "/public")) /*con __dirname le índico que en puclic estarán los archivos estáticos como el 
 style.css y realtimeproduct.js dentro de public*/
@@ -91,14 +92,14 @@ app.get("/login", (req, res) => {
   });
 });
 
-app.get("/register", (req, res) => {
+app.get("/formRegister", (req, res) => {
   // Renderiza la vista de registro
   res.render("formRegister", {
     title: "Registro"
   });
 });
 
-app.get("/profile", (req, res) => {
+app.get("/userProfile", (req, res) => {
   // Verifica si el usuario está autenticado
   if (!req.session.emailUsuario) {
     return res.redirect("/login");

@@ -1,11 +1,9 @@
-import { usersModel } from '../models/users.js'
-
+import { usersModel } from "../models/user.js"
 class UserManager {
     constructor() {
-        this.userModel = new usersModel();
+        this.userModel = usersModel;
 
     }
-
 
     async addUser(user) {
         try {
