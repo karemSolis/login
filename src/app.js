@@ -20,6 +20,10 @@ const fileStorage = FileStore(session)
 const product = new ProductManager(); /*esta variable es la copia de product.routes, pero es de ProductManager y
 todas sus funcionalidades. averiguar + */
 const carts = new CartManager();
+ 
+//analizarán solicitudes HTTP entrantes y los convertirán en formato json o url
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 
 mongoose.connect('mongodb+srv://soliskarem:yHO8pYSTC6sFsoi1@coder.9lutzzn.mongodb.net/?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true })
@@ -47,8 +51,8 @@ app.use(
       mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
     }),
     secret: "ClaveSecretaSeguraYUnicajojojo",
-    resave: true, 
-    saveUninitialized: true, 
+    resave: false, 
+    saveUninitialized: false, 
     cookie: {
       maxAge: 24 * 60 * 60 * 1000, 
     },
@@ -60,9 +64,6 @@ app.use("/api/productos", productRouter)
 app.use("/api/carritos", CartRouter);
 app.use("/api/sessions", userRouter)
 
-//analizarán solicitudes HTTP entrantes y los convertirán en formato json o url
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 
 
 //estos middlewars son toda la extructura de handlebars
