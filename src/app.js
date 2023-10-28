@@ -4,8 +4,8 @@ import CartRouter from "./router/cart.routes.js";
 import { engine } from "express-handlebars"; /*importación de módulo express-handlebars, osea la biblio para usar motores de plantillas handlebars con express */
 import * as path from "path" /*importación del módulo path de node.js, entrega utilidades para trabajar con rutas de archivos y directorios */
 import __dirname from "./utils.js"; /*importación de la variable __dirname desde el archivo utils.js*/
-import ProductManager from "./controllers/ProductManager.js";
-import CartManager from "./controllers/CartManager.js";
+import ProductManager from "./DAO/manager/ProductManager.js";
+import CartManager from "./DAO/manager/CartManager.js";
 import mongoose from "mongoose";
 import MongoStore from "connect-mongo"
 import session from 'express-session'

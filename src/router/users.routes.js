@@ -1,4 +1,4 @@
-import UserManager from "../controllers/UserManager.js";
+import UserManager from "../DAO/manager/UserManager.js";
 import { Router } from "express";
 
 
