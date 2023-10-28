@@ -7,8 +7,10 @@ class UserManager {
 
     async addUser(user) {
         try {
+            console.log("Intentando agregar nuevo usuario:", user);
             const newUser = new this.userModel(user);
             await newUser.save();
+            console.log("Usuario creado correctamente:", newUser);
             return 'Usuario creado correctamente';
         } catch (error) {
             console.error('Error al crear el usuario:', error);
@@ -19,17 +21,16 @@ class UserManager {
 
     async updateUser(id, updatedUser) {
         try {
-            const userToUpdate = await this.userModel.findById(id);
+            const userToUpdate = await UserManager.findById(id);
 
             if (!userToUpdate) {
                 return 'Usuario no encontrado';
             }
 
-
             userToUpdate.set(updatedUser);
 
             await userToUpdate.save();
-
+            console.log("Usuario actualizado correctamente:", userToUpdate);
             return 'Usuario actualizado correctamente';
         } catch (error) {
             console.error('Error al actualizar el usuario:', error);
@@ -41,7 +42,8 @@ class UserManager {
 
     async getUsers() {
         try {
-            const users = await this.userModel.find({});
+            const users = await UserManager.find({});
+            console.log("Usuarios obtenidos:", users);
             return users;
         } catch (error) {
             console.error('Error al obtener usuarios:', error);
@@ -52,10 +54,11 @@ class UserManager {
 
     async getUserById(id) {
         try {
-            const user = await this.userModel.findById(id).lean();
+            const user = await UserManager.findById(id).lean();
             if (!user) {
                 return 'Usuario no encontrado';
             }
+            console.log("Usuario obtenido por ID:", user);
             return user;
         } catch (error) {
             console.error('Error al obtener usuario por ID:', error);
@@ -66,13 +69,14 @@ class UserManager {
 
     async deleteUser(id) {
         try {
-            const user = await this.userModel.findById(id);
+            const user = await UserManager.findById(id);
 
             if (!user) {
                 return 'Usuario no encontrado';
             }
 
             await user.remove();
+            console.log("Usuario eliminado correctamente:", user);
             return 'Usuario eliminado correctamente';
         } catch (error) {
             console.error('Error al eliminar el usuario:', error);
@@ -83,7 +87,9 @@ class UserManager {
 
     async validateUser(email) {
         try {
-            const user = await this.userModel.findOne({ email });
+            console.log("Buscando usuario con email:", email);
+            const user = await UserManager.findOne({ email });
+            console.log("Usuario encontrado:", user);
 
             if (!user) {
                 return 'Usuario no encontrado';
@@ -97,4 +103,6 @@ class UserManager {
     }
 
 }
-export default UserManager;
+
+export default UserManager; 
+

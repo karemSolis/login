@@ -31,16 +31,30 @@ mongoose.connect('mongodb+srv://soliskarem:yHO8pYSTC6sFsoi1@coder.9lutzzn.mongod
   });
 
 
-app.use(session({
-  //Session registrada en mongo atlas
-  store: MongoStore.create({
-    mongoUrl: "mongodb+srv://soliskarem:yHO8pYSTC6sFsoi1@coder.9lutzzn.mongodb.net/?retryWrites=true&w=majority",
-    mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true }, ttl: 4000
-  }),
-  secret: "ClaveSecreta",
-  resave: true,
-  saveUninitialized: true,
-}))
+// app.use(session({
+//   store: MongoStore.create({
+//     mongoUrl: "mongodb+srv://soliskarem:yHO8pYSTC6sFsoi1@coder.9lutzzn.mongodb.net/?retryWrites=true&w=majority",
+//     mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true }, ttl: 4000
+//   }),
+//   secret: "ClaveSecreta",
+//   resave: true,
+//   saveUninitialized: true,
+// }))
+app.use(
+  session({
+    store: MongoStore.create({
+      mongoUrl: "mongodb+srv://soliskarem:yHO8pYSTC6sFsoi1@coder.9lutzzn.mongodb.net/?retryWrites=true&w=majority",
+      mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
+    }),
+    secret: "ClaveSecretaSeguraYUnicajojojo",
+    resave: true, 
+    saveUninitialized: true, 
+    cookie: {
+      maxAge: 24 * 60 * 60 * 1000, 
+    },
+  })
+);
+
 
 app.use("/api/productos", productRouter)
 app.use("/api/carritos", CartRouter);
@@ -62,21 +76,32 @@ es una ruta absoluta al directorio de vistas que utiliza __dirname que he import
 app.use("/", express.static(__dirname + "/public")) /*con __dirname le índico que en puclic estarán los archivos estáticos como el 
 style.css y realtimeproduct.js dentro de public*/
 
-
-//ruta a la página principal
-app.get("/", async (req, res) => {
-  let products = await product.getProducts()/*gracias a la constante product copiada y pegada desde product.router puedo reutilizar funciones de rutas hechas ahí */
-  res.render("products", { /*este render nos renderizará el archivo handlebars en main, pero a través de lo que hagamos en home */
-    title: "Productos",
-    products: products,
-  })
-})
+app.get("/products", async (req, res) => {
+  if (req.session.emailUsuario) {
+    // Un usuario está autenticado, verifica su rol y redirige en consecuencia
+    if (req.session.rolUsuario === 'admin') {
+      res.redirect("userProfile");
+    } else {
+      res.redirect("/products");
+    }
+  } else {
+    // Si no hay un usuario autenticado, muestra la página de inicio
+    let products = await product.getProducts();
+    res.render("products", {
+      title: "Productos",
+      products: products,
+      email: req.session.emailUsuario, // Aquí quitamos la asignación
+      rol: req.session.rolUsuario, // Aquí quitamos la asignación
+    });
+  }
+});
 
 app.get("/products/:id", async (req, res) => {
-  const productId = req.params.id;  // Obtiene el ID del producto desde la URL
-  const products = await product.getProductById(productId);  // Busca el producto por ID
-  res.render("details", { products });  // Pasa el producto encontrado a la vista
+  const productId = req.params.id;  
+  const products = await product.getProductById(productId);  
+  res.render("details", { products });  
 });
+
 
 app.get("/carts", async (req, res) => {
   const cart = await carts.readCarts(); // Usa cartManager en lugar de carts
@@ -104,11 +129,14 @@ app.get("/userProfile", (req, res) => {
   if (!req.session.emailUsuario) {
     return res.redirect("/login");
   }
-
   // Renderiza la vista de perfil
   res.render("userProfile", {
     title: "Perfil de Usuario",
-    email: req.session.emailUsuario
+    first_name: req.session.nomUsuario,
+    last_name: req.session.apeUsuario,
+    email: req.session.emailUsuario,
+    rol: req.session.rolUsuario,
+
   });
 });
 
