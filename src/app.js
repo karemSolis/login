@@ -38,8 +38,8 @@ app.use(
       mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
     }),
     secret: "ClaveSecretaSeguraYUnicajojojo",
-    resave: true,
-    saveUninitialized: true,
+    resave: false,
+    saveUninitialized: false,
     cookie: {
       maxAge: 24 * 60 * 60 * 1000,
     },
@@ -63,7 +63,7 @@ style.css y realtimeproduct.js dentro de public*/
 
 app.get("/products", async (req, res) => {
   if (req.session.emailUsuario) {
-   
+  
     if (req.session.rolUsuario === 'admin') {
       res.redirect("/login");
     } else {
@@ -71,7 +71,6 @@ app.get("/products", async (req, res) => {
     }
   } else {
 
-    
     let products = await product.getProducts();
     res.render("products", {
       title: "Productos",
@@ -87,7 +86,6 @@ app.get("/products/:id", async (req, res) => {
   const products = await product.getProductById(productId);
   res.render("details", { products });
 });
-
 
 app.get("/carts", async (req, res) => {
   const cart = await carts.readCarts(); 
@@ -110,21 +108,34 @@ app.get("/formRegister", (req, res) => {
   });
 });
 
+// app.get("/userProfile", (req, res) => {
+//   // Verifica si el usuario está autenticado
+//   if (req.session.rolUsuario === 'admin') {
+//     res.redirect("/login");
+//   } else {
+//     console.log("Valores de sesión:", req.session); 
+//     // Renderiza la vista de perfil
+//     res.render("userProfile", {
+//       title: "Perfil de Usuario",
+//       first_name: req.session.nomUsuario,
+//       last_name: req.session.apeUsuario,
+//       email: req.session.emailUsuario,
+//       rol: req.session.rolUsuario,
+//     });
+//   }
+// });
+
 app.get("/userProfile", (req, res) => {
-  // Verifica si el usuario está autenticado
-  if (!req.session.emailUsuario) {
-    return res.redirect("/login");
-  }
-  // Renderiza la vista de perfil
+  console.log("Valores de sesión:", req.session);
   res.render("userProfile", {
     title: "Perfil de Usuario",
     first_name: req.session.nomUsuario,
     last_name: req.session.apeUsuario,
     email: req.session.emailUsuario,
     rol: req.session.rolUsuario,
-
   });
 });
+
 
 
 
