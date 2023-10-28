@@ -1,8 +1,33 @@
 import UserManager from "../controllers/UserManager.js";
 import { Router } from "express";
 
-const user = new UserManager();
+
 const userRouter = Router();
+const user = new UserManager();
+
+userRouter.post("/login", async (req, res) => {
+    try {
+        const email = req.body.email;
+        const password = req.body.password;
+        console.log("Intento de inicio de sesión con email:", email);
+
+        const authenticatedUser = await user.validateUser(email);
+        console.log("Usuario validado:", authenticatedUser);
+
+        if (authenticatedUser && authenticatedUser.password === password) {
+            console.log("Inicio de sesión exitoso");
+            res.redirect("/userProfile"); 
+        } else {
+            console.log("Credenciales incorrectas");
+            res.redirect("/login?error=auth_failed"); // Redirige de vuelta a la página de inicio de sesión con un mensaje de error
+        }
+    } catch (error) {
+        // Manejo de errores
+        console.error('Error al iniciar sesión:', error);
+        res.status(500).send("Error al iniciar sesión: " + error.message);
+    }
+});
+
 
 userRouter.post("/formRegister", async (req, res) => {
     try {
@@ -15,36 +40,6 @@ userRouter.post("/formRegister", async (req, res) => {
     } catch (error) {
         console.error('Error al registrar el usuario:', error);
         res.status(500).send("Error al registrar el usuario: " + error.message);
-    }
-});
-
-userRouter.post("/login", async (req, res) => {
-    try {
-        const email = req.body.email;
-        const password = req.body.password;
-        console.log("Intento de inicio de sesión con email:", email);
-
-        const user = await user.validateUser(email);
-        console.log("Usuario validado:", user);
-
-        if (user.password === password) {
-            req.session.emailUsuario = user.email;
-            req.session.rolUsuario = user.rol;
-            req.session.age = user.age;
-
-            if (user.rol === 'admin') {
-                req.session.nomUsuario = user.first_name;
-                req.session.apeUsuario = user.last_name;
-                res.redirect("userProfile");
-            } else {
-                res.redirect("/products");
-            }
-        } else {
-            res.redirect("../../login");
-        }
-    } catch (error) {
-        console.error('Error al iniciar sesión:', error);
-        res.status(500).send("Error al iniciar sesión: " + error.message);
     }
 });
 

@@ -12,19 +12,16 @@ import session from 'express-session'
 import FileStore from 'session-file-store'
 import userRouter from "./router/users.routes.js";
 
-
-
 const app = express(); //aquí la creación de la instancia de la apli express
 const httpServer = app.listen(8080, () => console.log("servidor en el puerto 8080")); //definición del puerto http
 const fileStorage = FileStore(session)
 const product = new ProductManager(); /*esta variable es la copia de product.routes, pero es de ProductManager y
 todas sus funcionalidades. averiguar + */
 const carts = new CartManager();
- 
+
 //analizarán solicitudes HTTP entrantes y los convertirán en formato json o url
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-
 
 mongoose.connect('mongodb+srv://soliskarem:yHO8pYSTC6sFsoi1@coder.9lutzzn.mongodb.net/?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
@@ -34,16 +31,6 @@ mongoose.connect('mongodb+srv://soliskarem:yHO8pYSTC6sFsoi1@coder.9lutzzn.mongod
     console.error("Error de conexión a MongoDB Atlas: ", error);
   });
 
-
-// app.use(session({
-//   store: MongoStore.create({
-//     mongoUrl: "mongodb+srv://soliskarem:yHO8pYSTC6sFsoi1@coder.9lutzzn.mongodb.net/?retryWrites=true&w=majority",
-//     mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true }, ttl: 4000
-//   }),
-//   secret: "ClaveSecreta",
-//   resave: true,
-//   saveUninitialized: true,
-// }))
 app.use(
   session({
     store: MongoStore.create({
@@ -51,20 +38,17 @@ app.use(
       mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
     }),
     secret: "ClaveSecretaSeguraYUnicajojojo",
-    resave: false, 
-    saveUninitialized: false, 
+    resave: true,
+    saveUninitialized: true,
     cookie: {
-      maxAge: 24 * 60 * 60 * 1000, 
+      maxAge: 24 * 60 * 60 * 1000,
     },
   })
 );
 
-
 app.use("/api/productos", productRouter)
 app.use("/api/carritos", CartRouter);
 app.use("/api/sessions", userRouter)
-
-
 
 //estos middlewars son toda la extructura de handlebars
 app.engine("handlebars", engine());  /*acá le digo al servidor que usaremos M.P.handlebars para el uso de express y que será a
@@ -79,36 +63,37 @@ style.css y realtimeproduct.js dentro de public*/
 
 app.get("/products", async (req, res) => {
   if (req.session.emailUsuario) {
-    // Un usuario está autenticado, verifica su rol y redirige en consecuencia
+   
     if (req.session.rolUsuario === 'admin') {
-      res.redirect("userProfile");
+      res.redirect("/login");
     } else {
-      res.redirect("/products");
+      res.redirect("/userProfile");
     }
   } else {
-    // Si no hay un usuario autenticado, muestra la página de inicio
+
+    
     let products = await product.getProducts();
     res.render("products", {
       title: "Productos",
       products: products,
-      email: req.session.emailUsuario, // Aquí quitamos la asignación
-      rol: req.session.rolUsuario, // Aquí quitamos la asignación
+      email: req.session.emailUsuario,
+      rol: req.session.rolUsuario, 
     });
   }
 });
 
 app.get("/products/:id", async (req, res) => {
-  const productId = req.params.id;  
-  const products = await product.getProductById(productId);  
-  res.render("details", { products });  
+  const productId = req.params.id;
+  const products = await product.getProductById(productId);
+  res.render("details", { products });
 });
 
 
 app.get("/carts", async (req, res) => {
-  const cart = await carts.readCarts(); // Usa cartManager en lugar de carts
-  const productsInCart = await carts.getProductsForCart(cart.products); // Usa cartManager para llamar a getProductsForCart
+  const cart = await carts.readCarts(); 
+  const productsInCart = await carts.getProductsForCart(cart.products); 
   console.log("Datos del carrito:", cart);
-  res.render("carts", { cart, productsInCart }); // Pasa productsInCart a la vista
+  res.render("carts", { cart, productsInCart });
 });
 
 app.get("/login", (req, res) => {

@@ -21,7 +21,7 @@ class UserManager {
 
     async updateUser(id, updatedUser) {
         try {
-            const userToUpdate = await UserManager.findById(id);
+            const userToUpdate = await this.userModel.findById(id);
 
             if (!userToUpdate) {
                 return 'Usuario no encontrado';
@@ -42,7 +42,7 @@ class UserManager {
 
     async getUsers() {
         try {
-            const users = await UserManager.find({});
+            const users = await this.userModel.find({});
             console.log("Usuarios obtenidos:", users);
             return users;
         } catch (error) {
@@ -54,7 +54,7 @@ class UserManager {
 
     async getUserById(id) {
         try {
-            const user = await UserManager.findById(id).lean();
+            const user = await this.userModel.findById(id).lean();
             if (!user) {
                 return 'Usuario no encontrado';
             }
@@ -69,7 +69,7 @@ class UserManager {
 
     async deleteUser(id) {
         try {
-            const user = await UserManager.findById(id);
+            const user = await this.userModel.findById(id);
 
             if (!user) {
                 return 'Usuario no encontrado';
@@ -88,7 +88,7 @@ class UserManager {
     async validateUser(email) {
         try {
             console.log("Buscando usuario con email:", email);
-            const user = await UserManager.findOne({ email });
+            const user = await this.userModel.findOne({ email });
             console.log("Usuario encontrado:", user);
 
             if (!user) {
