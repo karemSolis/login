@@ -108,23 +108,6 @@ app.get("/formRegister", (req, res) => {
   });
 });
 
-// app.get("/userProfile", (req, res) => {
-//   // Verifica si el usuario está autenticado
-//   if (req.session.rolUsuario === 'admin') {
-//     res.redirect("/login");
-//   } else {
-//     console.log("Valores de sesión:", req.session); 
-//     // Renderiza la vista de perfil
-//     res.render("userProfile", {
-//       title: "Perfil de Usuario",
-//       first_name: req.session.nomUsuario,
-//       last_name: req.session.apeUsuario,
-//       email: req.session.emailUsuario,
-//       rol: req.session.rolUsuario,
-//     });
-//   }
-// });
-
 app.get("/userProfile", (req, res) => {
   console.log("Valores de sesión:", req.session);
   res.render("userProfile", {
@@ -135,6 +118,16 @@ app.get("/userProfile", (req, res) => {
     rol: req.session.rolUsuario,
   });
 });
+
+app.get("/logout", (req, res) => {
+  req.session.destroy((error) => {
+      if (error) {
+          return res.json({ status: 'Cerrar sesión Error', body: error });
+      }
+      res.redirect('/login'); // Redirige al usuario a la página de inicio de sesión después de cerrar sesión
+  });
+});
+
 
 
 
